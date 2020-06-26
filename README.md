@@ -1,5 +1,31 @@
 QFtpServer - an FTP server written in Qt
 ----------------------------------------
+### Changes
+It now emits signals whenever a file transfer starts and finishes.
+```FtpServer()``` constructor no longer starts a new connection, you should call ```start()``` and get a new connection from signal:
+```
+FtpServer *ftpServer = new FtpServer(this, "/home/user/ftplocation", 21, "Username", "Pass");
+ftpServer->start();
+
+
+connect(ftpServer, &FtpServer::newConnection, this, [=] (FtpControlConnection *connection) {
+
+	// don't forget to save a new connection because 
+	// it will automatically disconnect after some time and no signals will be emmited
+	ftpConnection = connection;							
+
+	// connect to fileTransferStarted signal if you wish
+     connect(ftpConnection, &FtpControlConnection::fileTransferStarted, this, &TestClass::waitForFtpTransfer);
+});
+```
+```fileTransferStarted``` contains file name in its argument. After it is emmited, you can connect to ```fileTransferFinished```:
+void TestClass::waitForFtpTransfer(QString fileName)
+{
+	connect(ftpConnection, &FtpControlConnection::fileTransferFinished, this, [=]{
+		// do something
+	});	
+}
+    ```
 
 ### Description
 

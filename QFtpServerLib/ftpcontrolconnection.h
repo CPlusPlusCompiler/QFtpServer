@@ -1,8 +1,10 @@
 #ifndef FTPCONTROLCONNECTION_H
 #define FTPCONTROLCONNECTION_H
 
+#include <memory>
 #include <QObject>
 #include <QPointer>
+#include <qftpserverlib_global.h>
 
 class QSslSocket;
 class FtpCommand;
@@ -13,15 +15,17 @@ class DataConnection;
 // command. All of the ftp commands except the ones that require a data
 // connection are implemented here.
 
-class FtpControlConnection : public QObject
+class QFTPSERVERLIBSHARED_EXPORT FtpControlConnection : public QObject
 {
     Q_OBJECT
 public:
-    explicit FtpControlConnection(QObject *parent, QSslSocket *socket, const QString &rootPath, const QString &userName = QString(), const QString &password = QString(), bool readOnly = false);
+    explicit FtpControlConnection(QObject *parent, QSslSocket *socket, const QString &rootPath,
+                                  const QString &userName = QString(), const QString &password = QString(), bool readOnly = false);
     ~FtpControlConnection();
 
 signals:
-
+    void fileTransferFinished();
+    void fileTransferStarted(QString fileName);
 public slots:
     // Slot used by the data connection handlers to send messages to the FTP
     // client through the control connection.

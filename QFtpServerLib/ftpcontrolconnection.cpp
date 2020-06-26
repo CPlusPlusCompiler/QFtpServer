@@ -157,6 +157,11 @@ QString FtpControlConnection::toLocalPath(const QString &fileName) const
 void FtpControlConnection::reply(const QString &replyCode)
 {
     qDebug() << "reply" << replyCode;
+
+    if(replyCode.contains("226")) {
+        emit fileTransferFinished();
+    }
+
     socket->write((replyCode + "\r\n").toUtf8());
 }
 
@@ -231,8 +236,9 @@ void FtpControlConnection::processCommand(const QString &entireCommand)
     } else if ("RNTO" == command) {
         rnto(toLocalPath(commandParameters));
     } else if ("APPE" == command) {
-        stor(toLocalPath(commandParameters), true);
-    } else {
+        stor(toLocalPath(commandParameters), true);    
+    }
+    else {
         reply("502 Command not implemented.");
     }
 
@@ -282,6 +288,7 @@ void FtpControlConnection::retr(const QString &fileName)
 
 void FtpControlConnection::stor(const QString &fileName, bool appendMode)
 {
+    emit fileTransferStarted(fileName);
     startOrScheduleCommand(new FtpStorCommand(this, fileName, appendMode, seekTo()));
 }
 

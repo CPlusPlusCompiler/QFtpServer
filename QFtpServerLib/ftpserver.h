@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QSet>
 #include <qftpserverlib_global.h>
+#include "ftpcontrolconnection.h"
 
 class SslServer;
 
@@ -27,12 +28,15 @@ public:
     // Get the LAN IP of the host, e.g. "192.168.1.10".
     static QString lanIp();
 
+    void start();
+
 signals:
     // A connection from a new IP has been established. This signal is emitted
     // when the FTP server is connected by a new IP. The new IP will then be
     // stored and will not cause this FTP server instance to emit this signal
     // any more.
     void newPeerIp(const QString &ip);
+    void newConnection(FtpControlConnection *connection);
 
 private slots:
     // Called by the SSL server when we have received a new connection.
@@ -60,6 +64,8 @@ private:
     // Whether or not the server is in read-only mode. In read-only mode the
     // server will not create, modify or delete any files or directories.
     bool readOnly;
+
+    int port;
 
     // Causes the server to remember the first IP that connects to it, and then
     // refuse connections from any other IP. This makes sense because a mobile
