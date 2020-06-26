@@ -9,23 +9,23 @@ ftpServer->start();
 
 
 connect(ftpServer, &FtpServer::newConnection, this, [=] (FtpControlConnection *connection) {
+   // don't forget to save a new connection because 
+   // it will automatically disconnect after some time and no signals will be emmited
+   ftpConnection = connection;							
 
-	// don't forget to save a new connection because 
-	// it will automatically disconnect after some time and no signals will be emmited
-	ftpConnection = connection;							
-
-	// connect to fileTransferStarted signal if you wish
-     connect(ftpConnection, &FtpControlConnection::fileTransferStarted, this, &TestClass::waitForFtpTransfer);
+   // connect to fileTransferStarted signal if you wish
+   connect(ftpConnection, &FtpControlConnection::fileTransferStarted, this, &TestClass::waitForFtpTransfer);
 });
 ```
 ```fileTransferStarted``` contains file name in its argument. After it is emmited, you can connect to ```fileTransferFinished```:
+```
 void TestClass::waitForFtpTransfer(QString fileName)
 {
-	connect(ftpConnection, &FtpControlConnection::fileTransferFinished, this, [=]{
-		// do something
-	});	
+   connect(ftpConnection, &FtpControlConnection::fileTransferFinished, this, [=]{
+   // do something
+   });	
 }
-    ```
+```
 
 ### Description
 
